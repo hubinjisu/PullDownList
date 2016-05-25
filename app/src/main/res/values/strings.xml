@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Demo</string>
+    <string name="dial_dtmf">二次拨号</string>
+    <string name="conf_close">关闭</string>
+    <string name="conf_control">控制</string>
+    <string name="call_answer">接听</string>
+    <string name="call_hangup">挂断</string>
+    <string name="call_connect">通话</string>
+    <string name="call_handsfree">免提</string>
+    <string name="call_prompt_tone">提示音</string>
+    <string name="call_remote_hold">被保持</string>
+    <string name="call_double_hold">双向保持</string>
+    <string name="conf_connect">会议中</string>
+    <string name="conf_leaving">离会中</string>
+    <string name="phone_ring">振铃中</string>
+    <string name="conf_leave">离会</string>
+    <string name="leave_conf">退会</string>
+    <string name="add_to_conf">追加</string>
+    <string name="return_conf">入会</string>
+    <string name="transfer_to_conf">转会议</string>
+</resources>
