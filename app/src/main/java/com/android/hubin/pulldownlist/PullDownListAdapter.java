@@ -40,6 +40,10 @@ public class PullDownListAdapter extends BaseAdapter
     private ListView callListView;
     private Handler mHandler;
 
+    /**
+     * 动态菜单列表适配器
+     * @param mContext
+     */
     public PullDownListAdapter(Context mContext)
     {
         this.context = mContext;
@@ -77,6 +81,10 @@ public class PullDownListAdapter extends BaseAdapter
         return 0;
     }
 
+    /**
+     * 添加列表数据
+     * @param listItems
+     */
     public void setListItem(List<? extends BaseListItem> listItems)
     {
         if (listItems != null)
@@ -170,21 +178,26 @@ public class PullDownListAdapter extends BaseAdapter
         ArrayList<ControlBtnItem> controlBtnItems = new ArrayList<ControlBtnItem>();
         viewHolder.timerView.setStartTime(item.getCallModel().getAbsoluteConnectTime(), true);
         // for test
-        controlBtnItems.add(createScallHangupControlItem(item));
-        controlBtnItems.add(createScallHoldControlItem(item));
-        controlBtnItems.add(createScallMuteControlItem(item));
-        controlBtnItems.add(createScallSpeakerControlItem(item));
-        controlBtnItems.add(createScallIntoConfControlItem(item));
+        controlBtnItems.add(new ControlBtnItem(context.getString(R.string.call_hangup), R.drawable.call_hangup_btn_select_bg, R.drawable
+                .call_control_btn_click_bg));
+        controlBtnItems.add(new ControlBtnItem("保持", R.drawable.call_hold_btn_select_bg, R.drawable.call_control_btn_select_bg));
+        controlBtnItems.add(new ControlBtnItem("静音", R.drawable.call_mute_btn_select_bg, R.drawable.call_control_btn_select_bg));
+        controlBtnItems.add(new ControlBtnItem(context.getString(R.string.call_handsfree), R.drawable.call_speaker_btn_select_bg, R.drawable
+                .call_control_btn_select_bg));
+        controlBtnItems.add(new ControlBtnItem(context.getString(R.string.return_conf), R.drawable.call_to_conf_btn_click_bg, R.drawable
+                .call_control_btn_click_bg));
         if (item.getName().equals("name1"))
         {
-            controlBtnItems.add(createScallTransferToConfControlItem(item));
-            controlBtnItems.add(createScallForwardControlItem(item));
+            controlBtnItems.add(new ControlBtnItem(context.getString(R.string.transfer_to_conf), R.drawable.call_to_conf_btn_click_bg, R.drawable
+                    .call_control_btn_click_bg));
+            controlBtnItems.add(new ControlBtnItem("转接", R.drawable.call_forward_btn_click_bg, R.drawable.call_control_btn_click_bg));
         }
         else if (item.getName().equals("name2"))
         {
-            controlBtnItems.add(createScallTransferToConfControlItem(item));
-            controlBtnItems.add(createScallForwardControlItem(item));
-            controlBtnItems.add(createVideoControlItem(item));
+            controlBtnItems.add(new ControlBtnItem(context.getString(R.string.transfer_to_conf), R.drawable.call_to_conf_btn_click_bg, R.drawable
+                    .call_control_btn_click_bg));
+            controlBtnItems.add(new ControlBtnItem("转接", R.drawable.call_forward_btn_click_bg, R.drawable.call_control_btn_click_bg));
+            controlBtnItems.add(new ControlBtnItem("视频", R.drawable.call_video_mute_btn_select_bg, R.drawable.call_control_btn_select_bg));
         }
 
         viewHolder.statusView.setText(context.getString(R.string.call_connect));
@@ -203,216 +216,44 @@ public class PullDownListAdapter extends BaseAdapter
         updateDropDownList(item, hasSecondLine);
     }
 
-    private ControlBtnItem createScallHangupControlItem(final CallListItem listItem)
+    private ControlBtnItem createShowMoreControlItem(final CallListItem listItem)
     {
-        ControlBtnItem controlBtnItem = new ControlBtnItem();
-        controlBtnItem.setName(context.getString(R.string.call_hangup));
-        controlBtnItem.setIconRes(R.drawable.call_hangup_btn_select_bg);
-        controlBtnItem.setBgRes(R.drawable.call_control_btn_click_bg);
+        ControlBtnItem controlBtnItem = new ControlBtnItem("更多", R.drawable.call_more_btn_select_bg, R.drawable.call_control_btn_select_bg);
+        controlBtnItem.setIsSelected(listItem.isDropDown());
         controlBtnItem.setClickListener(new OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-            }
-        });
-        return controlBtnItem;
-    }
-
-    private ControlBtnItem createScallSpeakerControlItem(final CallListItem listItem)
-    {
-        ControlBtnItem controlBtnItem = new ControlBtnItem();
-        controlBtnItem.setName(context.getString(R.string.call_handsfree));
-        controlBtnItem.setIconRes(R.drawable.call_speaker_btn_select_bg);
-        controlBtnItem.setBgRes(R.drawable.call_control_btn_select_bg);
-        controlBtnItem.setIsSelected(listItem.isSpeakerOn());
-        controlBtnItem.setClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            }
-        });
-        return controlBtnItem;
-    }
-
-    private ControlBtnItem createScallIntoConfControlItem(final CallListItem listItem)
-    {
-        ControlBtnItem controlBtnItem = new ControlBtnItem();
-        controlBtnItem.setName(context.getString(R.string.return_conf));
-        controlBtnItem.setIconRes(R.drawable.call_to_conf_btn_click_bg);
-        controlBtnItem.setBgRes(R.drawable.call_control_btn_click_bg);
-        controlBtnItem.setClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            }
-        });
-        return controlBtnItem;
-    }
-
-    private ControlBtnItem createScallAnswerControlItem(final CallListItem listItem)
-    {
-        ControlBtnItem controlBtnItem = new ControlBtnItem();
-        controlBtnItem.setName("接听");
-        controlBtnItem.setIconRes(R.drawable.call_answer);
-        controlBtnItem.setBgRes(R.drawable.call_control_btn_click_bg);
-        controlBtnItem.setClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            }
-        });
-        return controlBtnItem;
-    }
-
-    private ControlBtnItem createScallHoldControlItem(final CallListItem listItem)
-    {
-        ControlBtnItem controlBtnItem = new ControlBtnItem();
-        controlBtnItem.setName("保持");
-        controlBtnItem.setIconRes(R.drawable.call_hold_btn_select_bg);
-        controlBtnItem.setBgRes(R.drawable.call_control_btn_select_bg);
-        controlBtnItem.setClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            }
-        });
-        return controlBtnItem;
-    }
-
-    private ControlBtnItem createScallMuteControlItem(final CallListItem listItem)
-    {
-        ControlBtnItem controlBtnItem = new ControlBtnItem();
-        controlBtnItem.setName("静音");
-        controlBtnItem.setIconRes(R.drawable.call_mute_btn_select_bg);
-        controlBtnItem.setBgRes(R.drawable.call_control_btn_select_bg);
-        controlBtnItem.setIsSelected(listItem.isMuteOn());
-        controlBtnItem.setClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            }
-        });
-        return controlBtnItem;
-    }
-
-    private ControlBtnItem createScallTransferToConfControlItem(final CallListItem listItem)
-    {
-        ControlBtnItem controlBtnItem = new ControlBtnItem();
-        controlBtnItem.setName(context.getString(R.string.transfer_to_conf));
-        controlBtnItem.setIconRes(R.drawable.call_to_conf_btn_click_bg);
-        controlBtnItem.setBgRes(R.drawable.call_control_btn_click_bg);
-        controlBtnItem.setClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            }
-        });
-        return controlBtnItem;
-    }
-
-    private ControlBtnItem createDtmfControlItem(final CallListItem listItem)
-    {
-        ControlBtnItem controlBtnItem = new ControlBtnItem();
-        controlBtnItem.setName(context.getString(R.string.dial_dtmf));
-        controlBtnItem.setIconRes(R.drawable.call_dtmf_btn_click_bg);
-        controlBtnItem.setBgRes(R.drawable.call_control_btn_select_bg);
-        controlBtnItem.setClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            }
-        });
-        return controlBtnItem;
-    }
-
-//    private ControlBtnItem createCloseRingControlItem(final CallListItem listItem)
-//    {
-//        ControlBtnItem controlBtnItem = new ControlBtnItem();
-//        controlBtnItem.setName("闭铃");
-//        controlBtnItem.setIconRes(R.drawable.call_close_bell_btn_select_bg);
-//        controlBtnItem.setBgRes(R.drawable.call_control_btn_select_bg);
-//        controlBtnItem.setIsSelected(listItem.isCloseRing());
-//        controlBtnItem.setClickListener(new OnClickListener()
-//        {
-//            @Override
-//            public void onClick(View v)
-//            {
-//                try
-//                {
-//                    if (listItem.getStatus() == CommonConstantEntry.SCALL_STATE_CONNECT)
-//                    {
-//                        boolean enable = !listItem.isCloseRing();
-//                        Log.debug(TAG, "click:closeBell:: enable:" + enable);
-//                        v.setSelected(enable);
-//                        listItem.setCloseRing(enable);
-//                    }
-//                    else
-//                    {
-//                        ToastUtil.showToast(UiApplication.getCurrentContext().getString(R.string.fail_state));
-//                    }
-//                }
-//                catch (Exception e)
-//                {
-//                    Log.exception(TAG, e);
-//                }
-//            }
-//        });
-//        return controlBtnItem;
-//    }
-
-    private ControlBtnItem createVideoControlItem(final CallListItem listItem)
-    {
-        ControlBtnItem controlBtnItem = new ControlBtnItem();
-        controlBtnItem.setName("视频");
-        controlBtnItem.setIconRes(R.drawable.call_video_mute_btn_select_bg);
-        controlBtnItem.setBgRes(R.drawable.call_control_btn_select_bg);
-        controlBtnItem.setIsSelected(!listItem.isVideoClosed());
-        controlBtnItem.setClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            }
-        });
-        return controlBtnItem;
-    }
-
-    private ControlBtnItem createOutsideAudioControlItem(final CallListItem listItem)
-    {
-        ControlBtnItem controlBtnItem = new ControlBtnItem();
-        controlBtnItem.setName("声音控制");
-        controlBtnItem.setIconRes(R.drawable.call_outside_audio_btn_select_bg);
-        controlBtnItem.setBgRes(R.drawable.call_control_btn_select_bg);
-        controlBtnItem.setIsSelected(listItem.isOutSideAudio());
-        controlBtnItem.setClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            }
-        });
-        return controlBtnItem;
-    }
-
-    private ControlBtnItem createConfCloseControlItem(final CallListItem listItem)
-    {
-        ControlBtnItem controlBtnItem = new ControlBtnItem();
-        controlBtnItem.setName("关闭");
-        controlBtnItem.setIconRes(R.drawable.call_hangup_btn_select_bg);
-        controlBtnItem.setBgRes(R.drawable.call_control_btn_click_bg);
-        controlBtnItem.setClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
+                try
+                {
+                    boolean enable = !v.isSelected();
+                    v.setSelected(enable);
+                    if (enable)
+                    {
+                        listItem.setIsActionShow(true);
+                        // 隐藏其他已下拉的菜单
+                        for (CallListItem callItem : mListItems)
+                        {
+                            if (callItem.isDropDown())
+                            {
+                                listItem.setIsActionHide(false);
+                                callItem.setIsDropDown(false);
+                                updateListItem(callItem);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        listItem.setIsActionHide(true);
+                    }
+                    listItem.setIsDropDown(enable);
+                    updateListItem(listItem);
+                }
+                catch (Exception e)
+                {
+                }
             }
         });
         return controlBtnItem;
@@ -456,68 +297,6 @@ public class PullDownListAdapter extends BaseAdapter
         }
     }
 
-    private ControlBtnItem createShowMoreControlItem(final CallListItem listItem)
-    {
-        ControlBtnItem controlBtnItem = new ControlBtnItem();
-        controlBtnItem.setName("更多");
-        controlBtnItem.setIconRes(R.drawable.call_more_btn_select_bg);
-        controlBtnItem.setBgRes(R.drawable.call_control_btn_select_bg);
-        controlBtnItem.setIsSelected(listItem.isDropDown());
-        controlBtnItem.setClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                try
-                {
-                    boolean enable = !v.isSelected();
-                    v.setSelected(enable);
-                    if (enable)
-                    {
-                        listItem.setIsActionShow(true);
-                        // 隐藏其他已下拉的菜单
-                        for (CallListItem callItem : mListItems)
-                        {
-                            if (callItem.isDropDown())
-                            {
-                                listItem.setIsActionHide(false);
-                                callItem.setIsDropDown(false);
-                                updateListItem(callItem);
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        listItem.setIsActionHide(true);
-                    }
-                    listItem.setIsDropDown(enable);
-                    updateListItem(listItem);
-                }
-                catch (Exception e)
-                {
-                }
-            }
-        });
-        return controlBtnItem;
-    }
-
-    private ControlBtnItem createScallForwardControlItem(final CallListItem listItem)
-    {
-        ControlBtnItem controlBtnItem = new ControlBtnItem();
-        controlBtnItem.setName("转接");
-        controlBtnItem.setIconRes(R.drawable.call_forward_btn_click_bg);
-        controlBtnItem.setBgRes(R.drawable.call_control_btn_click_bg);
-        controlBtnItem.setClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-            }
-        });
-        return controlBtnItem;
-    }
-
     /**
      * 方法说明 : 更新列表单条记录
      *
@@ -535,6 +314,60 @@ public class PullDownListAdapter extends BaseAdapter
             msg.what = UPDATE_LIST_ITEM;
             msg.obj = callListItem;
             mHandler.sendMessageDelayed(msg, 100);
+        }
+    }
+
+    /**
+     * 展开伸缩动画
+     */
+    public static Animation expand(final View v, final int lowerHeight, final int higherHeight, final boolean expand, long duration)
+    {
+        try
+        {
+            if (expand)
+            {
+                v.getLayoutParams().height = lowerHeight;
+            }
+            else
+            {
+                v.getLayoutParams().height = higherHeight;
+            }
+            v.setVisibility(View.VISIBLE);
+            Animation a = new Animation()
+            {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t)
+                {
+                    int newHeight = 0;
+                    if (expand)
+                    {
+                        newHeight = (int) (lowerHeight + (higherHeight - lowerHeight) * interpolatedTime);
+                    }
+                    else
+                    {
+                        newHeight = (int) (higherHeight - (higherHeight - lowerHeight) * interpolatedTime);
+                    }
+                    v.getLayoutParams().height = newHeight;
+                    v.requestLayout();
+                    if (interpolatedTime == 1 && !expand && lowerHeight == 0)
+                    {
+                        v.setVisibility(View.GONE);
+                    }
+                }
+
+                @Override
+                public boolean willChangeBounds()
+                {
+                    return true;
+                }
+            };
+            a.setDuration(duration);
+            a.setInterpolator(new AccelerateDecelerateInterpolator());
+            return a;
+        }
+        catch (Exception e)
+        {
+            return null;
         }
     }
 
@@ -628,60 +461,6 @@ public class PullDownListAdapter extends BaseAdapter
         TextView priorityView;
         GridView controlView;
         int index;
-    }
-
-    /**
-     * 展开伸缩动画
-     */
-    public static Animation expand(final View v, final int lowerHeight, final int higherHeight, final boolean expand, long duration)
-    {
-        try
-        {
-            if (expand)
-            {
-                v.getLayoutParams().height = lowerHeight;
-            }
-            else
-            {
-                v.getLayoutParams().height = higherHeight;
-            }
-            v.setVisibility(View.VISIBLE);
-            Animation a = new Animation()
-            {
-                @Override
-                protected void applyTransformation(float interpolatedTime, Transformation t)
-                {
-                    int newHeight = 0;
-                    if (expand)
-                    {
-                        newHeight = (int) (lowerHeight + (higherHeight - lowerHeight) * interpolatedTime);
-                    }
-                    else
-                    {
-                        newHeight = (int) (higherHeight - (higherHeight - lowerHeight) * interpolatedTime);
-                    }
-                    v.getLayoutParams().height = newHeight;
-                    v.requestLayout();
-                    if (interpolatedTime == 1 && !expand && lowerHeight == 0)
-                    {
-                        v.setVisibility(View.GONE);
-                    }
-                }
-
-                @Override
-                public boolean willChangeBounds()
-                {
-                    return true;
-                }
-            };
-            a.setDuration(duration);
-            a.setInterpolator(new AccelerateDecelerateInterpolator());
-            return a;
-        }
-        catch (Exception e)
-        {
-            return null;
-        }
     }
 
 }

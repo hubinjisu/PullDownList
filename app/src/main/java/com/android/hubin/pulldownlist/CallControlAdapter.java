@@ -24,6 +24,11 @@ public class CallControlAdapter extends BaseAdapter
     private List<ControlBtnItem> mDataSource;
     private Context context;
 
+    /**
+     * 构造控制菜单适配器
+     * @param context
+     * @param dataSrc
+     */
     public CallControlAdapter(Context context, List<ControlBtnItem> dataSrc)
     {
         this.context = context;

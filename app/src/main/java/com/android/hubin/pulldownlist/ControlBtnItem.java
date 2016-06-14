@@ -17,6 +17,13 @@ public class ControlBtnItem
     private boolean isSelected;
     private View.OnClickListener clickListener;
 
+    public ControlBtnItem(String name, int iconRes, int bgRes)
+    {
+        this.name = name;
+        this.iconRes = iconRes;
+        this.bgRes = bgRes;
+    }
+
     public boolean isSelected()
     {
         return isSelected;
