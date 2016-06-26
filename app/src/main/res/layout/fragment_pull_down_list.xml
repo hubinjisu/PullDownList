@@ -6,13 +6,13 @@
     android:paddingRight="5dp"
     android:orientation="vertical" >
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/call_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:dividerHeight="3dp" >
-    </ListView>
+    </android.support.v7.widget.RecyclerView>
 
     <!--
     <ScrollView

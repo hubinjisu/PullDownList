@@ -2,6 +2,8 @@ package com.android.hubin.pulldownlist;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +23,7 @@ import android.widget.ListView;
 public class PullDownListFragment extends Fragment
 {
     private static final String TAG = PullDownListFragment.class.getSimpleName();
-    private ListView callListView;
+    private RecyclerView callListView;
     private PullDownListAdapter listAdapter;
     private View layoutView;
 
@@ -40,10 +42,12 @@ public class PullDownListFragment extends Fragment
 
     public void initComponentViews(View view)
     {
-        callListView = (ListView) view.findViewById(R.id.call_list);
+        callListView = (RecyclerView) view.findViewById(R.id.call_list);
         listAdapter = new PullDownListAdapter(getActivity());
-        listAdapter.setListView(callListView);
         callListView.setAdapter(listAdapter);
+        callListView.setHasFixedSize(true);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        callListView.setLayoutManager(layoutManager);
         callListView.setLayoutAnimation(getListViewAnimationController());
         listAdapter.updateList();
     }

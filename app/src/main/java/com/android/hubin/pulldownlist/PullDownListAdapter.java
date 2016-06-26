@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -27,17 +28,15 @@ import java.util.List;
  * @author hubin
  * @Date 2015-4-1
  */
-public class PullDownListAdapter extends BaseAdapter
+public class PullDownListAdapter extends RecyclerView.Adapter<PullDownListAdapter.ViewHolder>
 {
     public static final int UPDATE_LIST = 0;
     public static final int UPDATE_LIST_ITEM = 1;
     private static final String TAG = "PullDownListAdapter";
     public List<CallListItem> mListItems;
     protected LayoutInflater inflater;
-    private ViewHolder viewHolder;
     private Context context;
     private int controlViewHeight;
-    private ListView callListView;
     private Handler mHandler;
 
     /**
@@ -53,8 +52,42 @@ public class PullDownListAdapter extends BaseAdapter
     }
 
     @Override
-    public int getCount()
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View convertView = inflater.inflate(R.layout.adapter_pull_down_list_item, parent, false);
+        return new ViewHolder(convertView);
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        final CallListItem item = mListItems.get(position);
+        if (item == null)
+        {
+            return;
+        }
+
+        try
+        {
+            // show the item info
+            holder.nameView.setText(item.getName());
+            holder.numberView.setText(item.getNumber());
+            holder.priorityView.setVisibility(View.VISIBLE);
+            holder.iconView.setImageResource(R.drawable.channel_left_scall);
+            // init control buttons based on status
+            handleStatus(holder, item);
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
+    @Override
+    public long getItemId(int position)
     {
+        return 0;
+    }
+
+    @Override
+    public int getItemCount() {
         if (mListItems != null && mListItems.size() > 0)
         {
             return mListItems.size();
@@ -63,22 +96,6 @@ public class PullDownListAdapter extends BaseAdapter
         {
             return 0;
         }
-    }
-
-    @Override
-    public Object getItem(int position)
-    {
-        if (mListItems != null && position >= 0 && position < mListItems.size())
-        {
-            return mListItems.get(position);
-        }
-        return new CallListItem();
-    }
-
-    @Override
-    public long getItemId(int position)
-    {
-        return 0;
     }
 
     /**
@@ -94,86 +111,7 @@ public class PullDownListAdapter extends BaseAdapter
         }
     }
 
-    public void setListView(ListView listView)
-    {
-        this.callListView = listView;
-    }
-
-    /**
-     * 方法说明 : 更新列表单行记录状态
-     *
-     * @param callListItem
-     * @return void
-     * @author hubin
-     * @Date 2015-4-14
-     */
-    private void updateSingleRow(CallListItem callListItem)
-    {
-        if (callListView != null)
-        {
-            int start = callListView.getFirstVisiblePosition();
-            for (int i = start, j = callListView.getLastVisiblePosition(); i <= j; i++)
-            {
-                if (callListItem == callListView.getItemAtPosition(i))
-                {
-                    View view = callListView.getChildAt(i - start);
-                    getView(i, view, callListView);
-                    break;
-                }
-            }
-        }
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent)
-    {
-        if (convertView != null)
-        {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
-        else
-        {
-            convertView = inflater.inflate(R.layout.adapter_pull_down_list_item, null);
-            viewHolder = new ViewHolder();
-            viewHolder.iconView = (ImageView) convertView.findViewById(R.id.caller_icon);
-            viewHolder.callStatus = (ImageView) convertView.findViewById(R.id.status_call);
-            viewHolder.nameView = (TextView) convertView.findViewById(R.id.caller_name);
-            viewHolder.numberView = (TextView) convertView.findViewById(R.id.caller_number);
-            viewHolder.statusView = (TextView) convertView.findViewById(R.id.call_status);
-            viewHolder.timerView = (TimerText) convertView.findViewById(R.id.call_list_timer);
-            viewHolder.priorityView = (TextView) convertView.findViewById(R.id.call_priority);
-            viewHolder.controlView = (GridView) convertView.findViewById(R.id.call_control);
-            convertView.setTag(viewHolder);
-        }
-        if (mListItems == null || mListItems.size() <= position)
-        {
-            return convertView;
-        }
-        final CallListItem item = mListItems.get(position);
-        if (item == null)
-        {
-            return convertView;
-        }
-
-        try
-        {
-            viewHolder.index = position;
-            // show the item info
-            viewHolder.nameView.setText(item.getName());
-            viewHolder.numberView.setText(item.getNumber());
-            viewHolder.priorityView.setVisibility(View.VISIBLE);
-            viewHolder.iconView.setImageResource(R.drawable.channel_left_scall);
-            // init control buttons based on status
-            handleStatus(item);
-        }
-        catch (Exception e)
-        {
-        }
-
-        return convertView;
-    }
-
-    private void handleStatus(final CallListItem item)
+    private void handleStatus(ViewHolder viewHolder, final CallListItem item)
     {
         ArrayList<ControlBtnItem> controlBtnItems = new ArrayList<ControlBtnItem>();
         viewHolder.timerView.setStartTime(item.getCallModel().getAbsoluteConnectTime(), true);
@@ -213,7 +151,7 @@ public class PullDownListAdapter extends BaseAdapter
         viewHolder.controlView.setAdapter(new CallControlAdapter(context, controlBtnItems));
 
         // update the pulling down view
-        updateDropDownList(item, hasSecondLine);
+        updateDropDownList(viewHolder, item, hasSecondLine);
     }
 
     private ControlBtnItem createShowMoreControlItem(final CallListItem listItem)
@@ -233,13 +171,12 @@ public class PullDownListAdapter extends BaseAdapter
                     {
                         listItem.setIsActionShow(true);
                         // 隐藏其他已下拉的菜单
-                        for (CallListItem callItem : mListItems)
-                        {
-                            if (callItem.isDropDown())
+                        for (int i = 0; i < mListItems.size(); i++) {
+                            if (mListItems.get(i).isDropDown())
                             {
                                 listItem.setIsActionHide(false);
-                                callItem.setIsDropDown(false);
-                                updateListItem(callItem);
+                                mListItems.get(i).setIsDropDown(false);
+                                notifyItemChanged(i);
                                 break;
                             }
                         }
@@ -249,7 +186,7 @@ public class PullDownListAdapter extends BaseAdapter
                         listItem.setIsActionHide(true);
                     }
                     listItem.setIsDropDown(enable);
-                    updateListItem(listItem);
+                    notifyItemChanged(mListItems.indexOf(listItem));
                 }
                 catch (Exception e)
                 {
@@ -259,7 +196,7 @@ public class PullDownListAdapter extends BaseAdapter
         return controlBtnItem;
     }
 
-    private void updateDropDownList(CallListItem item, boolean hasSecondLine)
+    private void updateDropDownList(ViewHolder viewHolder, CallListItem item, boolean hasSecondLine)
     {
         if (!hasSecondLine)
         {
@@ -294,26 +231,6 @@ public class PullDownListAdapter extends BaseAdapter
                     // viewHolder.controlView.requestLayout();
                 }
             }
-        }
-    }
-
-    /**
-     * 方法说明 : 更新列表单条记录
-     *
-     * @param callListItem
-     * @return void
-     * @author hubin
-     * @Date 2015-4-14
-     */
-    public void updateListItem(CallListItem callListItem)
-    {
-        if (mHandler != null && callListItem != null)
-        {
-            mHandler.removeMessages(UPDATE_LIST_ITEM, callListItem);
-            Message msg = mHandler.obtainMessage();
-            msg.what = UPDATE_LIST_ITEM;
-            msg.obj = callListItem;
-            mHandler.sendMessageDelayed(msg, 100);
         }
     }
 
@@ -414,7 +331,6 @@ public class PullDownListAdapter extends BaseAdapter
                     {
                         case UPDATE_LIST_ITEM:
                             // 更新列表单条记录状态
-                            mOwner.get().updateSingleRow((CallListItem) msg.obj);
                             break;
                         case UPDATE_LIST:
                             // 更新列表全部记录状态
@@ -450,7 +366,7 @@ public class PullDownListAdapter extends BaseAdapter
         }
     }
 
-    class ViewHolder
+    class ViewHolder extends RecyclerView.ViewHolder
     {
         ImageView iconView;
         ImageView callStatus;
@@ -461,6 +377,18 @@ public class PullDownListAdapter extends BaseAdapter
         TextView priorityView;
         GridView controlView;
         int index;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            iconView = (ImageView) itemView.findViewById(R.id.caller_icon);
+            callStatus = (ImageView) itemView.findViewById(R.id.status_call);
+            nameView = (TextView) itemView.findViewById(R.id.caller_name);
+            numberView = (TextView) itemView.findViewById(R.id.caller_number);
+            statusView = (TextView) itemView.findViewById(R.id.call_status);
+            timerView = (TimerText) itemView.findViewById(R.id.call_list_timer);
+            priorityView = (TextView) itemView.findViewById(R.id.call_priority);
+            controlView = (GridView) itemView.findViewById(R.id.call_control);
+        }
     }
 
 }
